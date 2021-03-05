@@ -1,6 +1,8 @@
-from fpylll import IntegerMatrix, SVP
+from fpylll import IntegerMatrix, SVP,FPLLL
 import sys
 from gmpy2 import gcd,mpz
+FPLLL.set_external_enumerator(None)
+ccorn_variant = False
 
 def svp(B):
 	A = IntegerMatrix.from_matrix(B)
@@ -24,15 +26,15 @@ def is_smooth(x, P):
 
 # This piece of code is borrowed from pollards rho algorithm
 # It checks if a powersmooth number is gcd((a**M)-1,N) > 1.
-# B is always 2.
-def try_factor(N,M,B=3):
+def try_factor(N,M,B=5):
     found = False
     N = mpz(N)
     M = mpz(abs(M))
     for base in range(2,B):
         if gcd(base,N) == 1:
-            g0 = gcd((2**M)-1,N)
-            if g0 > 1:
+            p = gcd((2**M)-1,N)
+            if p > 1:
+                q = N//p
                 print("Base: %d ,M: %d" % (base,M))
                 print("Found: %d = %d * %d" % (N,p,q))
                 found = True
@@ -56,7 +58,20 @@ def test_Schnorr(N, n, prec=1000):
 
 
     b = svp(B)
-    e = [b[i] / sr(N*f[i]) for i in range(n)]
+    if ccorn_variant:
+        e = [b[i] / diag[i] for i in range(n)]
+        en = (b[n] - sum(e[i]*B[i, n] for i in range(n))) / B[n, n]
+        assert en in ZZ
+        if en == 1:
+            #print("\nFlipping sign of SVP solution with e_{n+1} == %d" % en)
+            e = [-ei for ei in e]
+            en = -en    # just for consistency
+        elif en != -1:
+            #print("\nSkipping SVP solution with e_{n+1} == %d" % en)
+            return False,False
+    else:
+        e = [b[i] / sr(N*f[i]) for i in range(n)]
+
 
     u = 1
     v = 1
@@ -69,9 +84,10 @@ def test_Schnorr(N, n, prec=1000):
 
     r = (u - v*N, P)
     b  = is_smooth(r[0],r[1])
+    f = False
     if b:
         f = try_factor(N,r[0])
-    return b,f
+    return (b,f)
             
 
 try:
