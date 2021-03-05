@@ -24,7 +24,8 @@ def is_smooth(x, P):
 
 # This piece of code is borrowed from pollards rho algorithm
 # It checks if a powersmooth number is gcd((a**M)-1,N) > 1.
-def try_factor(N,M,B=1000):
+# B is always 2.
+def try_factor(N,M,B=3):
     found = False
     N = mpz(N)
     M = mpz(abs(M))
@@ -32,7 +33,8 @@ def try_factor(N,M,B=1000):
         if gcd(base,N) == 1:
             g0 = gcd((2**M)-1,N)
             if g0 > 1:
-                print("Base:",base,"M:",M,"g0:",g0,N)
+                print("Base: %d ,M: %d" % (base,M))
+                print("Found: %d = %d * %d" % (N,p,q))
                 found = True
                 break
     return found
