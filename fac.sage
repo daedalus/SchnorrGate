@@ -26,13 +26,13 @@ def is_smooth(x, P):
 
 # This piece of code is borrowed from pollards p-1 algorithm
 # It checks if a powersmooth number M is gcd((a**M)-1,N) > 1.
-def try_factor(N,M,B=5):
+def try_factor(N,M,B=1000):
     found = False
     N = mpz(N)
     M = mpz(abs(M))
     for base in range(2,B):
         if gcd(base,N) == 1:
-            p = gcd((2**M)-1,N)
+            p = gcd(pow(base,M,N)-1,N)
             if p > 1:
                 q = N//p
                 print("Base: %d ,M: %d" % (base,M))
@@ -115,10 +115,11 @@ for i in range(trials):
     q = random_prime(2^(bits/2), false, 2^(bits/2-1))
     N = p*q
     success,f = test_Schnorr(N, n)
+    successes += success
     if success:
         fc +=f
-        successes += success
-        print("Trial: %d success: %d" % (i,success), end="\t")
+
+        print("Trial: %d success: %d" % (i,successes), end="\t")
         print("factored count:",fc)
     sys.stdout.flush()
 
