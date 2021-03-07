@@ -1,9 +1,10 @@
 from fpylll import IntegerMatrix, SVP,FPLLL
 import sys
 from gmpy2 import gcd,mpz
-FPLLL.set_external_enumerator(None)
+#FPLLL.set_external_enumerator(None)
 ccorn_variant = False
 
+P=[]
 def svp(B):
 	A = IntegerMatrix.from_matrix(B)
 	return SVP.shortest_vector(A)
@@ -26,7 +27,7 @@ def is_smooth(x, P):
 
 # This piece of code is borrowed from pollards p-1 algorithm
 # It checks if a powersmooth number M is gcd((a**M)-1,N) > 1.
-def try_factor(N,M,B=1000):
+def try_factor(N,M,B=10000):
     found = False
     N = mpz(N)
     M = mpz(abs(M))
@@ -43,7 +44,9 @@ def try_factor(N,M,B=1000):
 
 # Test if a factoring relation was indeed found.
 def test_Schnorr(N, n, prec=1000):
-    P = first_primes(n)
+    global P
+    if len(P) == 0:
+        P = first_primes(n)
     f = list(range(1, n+1))
     shuffle(f)
 
