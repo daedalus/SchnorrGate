@@ -56,16 +56,15 @@ def test_Schnorr(N, n, prec=1000):
 
     if ccorn_variant: 
         N1 = round((N^(1/(n+1))) * (2^prec)) / (2^prec)
-	diag = [sr(N1*f[i]) for i in range(n)] + [sr(N1*ln(N))]
-	B = diagonal_matrix(diag, sparse=False)
-	for i in range(n):
-		B[i, n] = sr(N1*ln(P[i]))
+        diag = [sr(N1*f[i]) for i in range(n)] + [sr(N1*ln(N))]
+        B = diagonal_matrix(diag, sparse=False)
+        for i in range(n):
+            B[i, n] = sr(N1*ln(P[i]))
     else:
         diag = [sr(N*f[i]) for i in range(n)] + [sr(N*ln(N))]
         B = diagonal_matrix(diag, sparse=False)
         for i in range(n):
             B[i, n] = sr(N*ln(P[i]))
-
 
     b = svp(B)
     if ccorn_variant:
