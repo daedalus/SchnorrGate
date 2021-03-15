@@ -46,7 +46,7 @@ def try_factor(N,M,B=10000):
 def test_Schnorr(N, n, prec=1000):
     global P
     if len(P) == 0:
-        P = first_primes(n)
+        P = Primes()[:n]
     f = list(range(1, n+1))
     shuffle(f)
 
@@ -54,10 +54,17 @@ def test_Schnorr(N, n, prec=1000):
     def sr(x):
         return round(x * 2^prec)
 
-    diag = [sr(N*f[i]) for i in range(n)] + [sr(N*ln(N))]
-    B = diagonal_matrix(diag, sparse=False)
-    for i in range(n):
-        B[i, n] = sr(N*ln(P[i]))
+    if ccorn_variant: 
+        N1 = round((N^(1/(n+1))) * (2^prec)) / (2^prec)
+	diag = [sr(N1*f[i]) for i in range(n)] + [sr(N1*ln(N))]
+	B = diagonal_matrix(diag, sparse=False)
+	for i in range(n):
+		B[i, n] = sr(N1*ln(P[i]))
+    else:
+        diag = [sr(N*f[i]) for i in range(n)] + [sr(N*ln(N))]
+        B = diagonal_matrix(diag, sparse=False)
+        for i in range(n):
+            B[i, n] = sr(N*ln(P[i]))
 
 
     b = svp(B)
